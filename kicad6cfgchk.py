@@ -3,6 +3,7 @@
 """Check a user's KiCad6 configuration and emit diagnostics"""
 
 import sys
+import os
 import argparse
 import pathlib
 import re
@@ -10,25 +11,34 @@ import json
 import sexpdata
 
 
-VERSION = '2022-03-11'  # today's date
+VERSION = '2022-03-12'  # today's date
 SYM_LIB_TABLE = {'name': 'sym_lib_table', 'file': 'sym-lib-table',
                  'var': 'KICAD6_SYMBOL_DIR', 'path': ''}
 FP_LIB_TABLE = {'name': 'fp_lib_table', 'file': 'fp-lib-table',
                 'var': 'KICAD6_FOOTPRINT_DIR', 'path': ''}
 ENVVAR_RE = re.compile(r'(\$\{(\w+)\})', re.A)
 ARGS = None
+PLATFORM = sys.platform
 
 
 def platform_defaults():
     """Set table paths and return configuration directory for current platform"""
     home = pathlib.Path.home()
-    if sys.platform == 'linux':
+    if PLATFORM == 'linux':
         cfgdir = home / '.config' / 'kicad' / '6.0'
         SYM_LIB_TABLE['path'] = '/usr/share/kicad/symbols'
         FP_LIB_TABLE['path'] = '/usr/share/kicad/footprints'
+    elif PLATFORM == 'darwin':
+        cfgdir = home / 'Library' / 'Preferences' / 'kicad' / '6.0'
+        SYM_LIB_TABLE['path'] = '/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols'
+        FP_LIB_TABLE['path'] = '/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints'
+    elif PLATFORM == 'win32':
+        home = pathlib.Path(os.getenv('APPDATA'))
+        cfgdir = home / 'kicad' / 'lib' / '6.0'
+        SYM_LIB_TABLE['path'] = '\\Program Files\\KiCad\\6.0\\share\\kicad\\symbols'
+        FP_LIB_TABLE['path'] = '\\Program Files\\KiCad\\6.0\\share\\kicad\\footprints'
     else:
-        # To do: platforms other than Linux
-        sys.exit('Other platforms coming soon')
+        sys.exit('Platform not supported')
     return str(cfgdir)
 
 
@@ -80,6 +90,8 @@ def sub_env_var(uri, envvars):
     else:
         new = envvars[envvar]
         uri = uri.replace(old, new)
+    if PLATFORM == 'win32':
+        return uri.replace('/', '\\')
     return uri
 
 

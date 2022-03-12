@@ -28,7 +28,7 @@ optional arguments:
 
 ## To do
 
-Other platform defaults for configuration directory and library defines
+Check if it works on OS/X and Windows with the paths in code
 
 ## Author
 

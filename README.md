@@ -1,4 +1,4 @@
-# KiCad 6 configuration checker
+# KiCad 7 configuration checker
 
 This is a CLI Python3 program to check a user's configuration and emit diagnostics
 
@@ -13,9 +13,9 @@ Takes an optional argument to specify the configuration directory which override
 ## Usage
 
 ```
-python3 kicad6cfgchk.py [-h] [-a] [-v] [directory]
+python3 kicad7cfgchk.py [-h] [-a] [-v] [directory]
 
-Check a user's KiCad6 configuration and emit diagnostics
+Check a user's KiCad7 configuration and emit diagnostics
 
 positional arguments:
   directory      Configuration directory
